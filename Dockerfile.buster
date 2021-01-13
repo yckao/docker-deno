@@ -1,0 +1,16 @@
+FROM rust:buster AS builder
+
+ENV DENO_VERSION v1.6.3
+
+WORKDIR /workspace
+
+RUN cargo install --git https://github.com/denoland/deno --tag ${DENO_VERSION} --locked --root /workspace deno
+
+FROM debian:buster
+
+COPY --from=builder /workspace/bin/deno /usr/local/deno
+COPY docker-entrypoint.sh /usr/local/bin/
+
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+CMD [ "deno" ]
